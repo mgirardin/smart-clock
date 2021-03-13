@@ -6,12 +6,18 @@ const byte DNS_PORT = 53;
 DNSServer dnsServer;
 ESP8266WebServer webServer(80);
 IPAddress apIP(192, 168, 4, 1);
-String responseHTML = ""
+String captivePortalHTML = ""
                       "<!DOCTYPE html><html lang='en'><head>"
                       "<meta name='viewport' content='width=device-width'>"
                       "<title>CaptivePortal</title></head><body>"
-                      "<h1>Hello World!</h1><p>This is a captive portal example."
-                      " All requests will be redirected here.</p></body></html>";
+                      "<h2>Smart Clock</h2>"
+                      "<p></p>"
+                      "<p></p>"
+                      "<form>"
+                      "<label for='time'>Horário:</label><br>"
+                      "<input type='time' id='time' name='time'>"
+                      "<input type='submit'>"
+                      "</form>";
 
 void setup()
 {
@@ -28,7 +34,7 @@ void setup()
   
   webServer.onNotFound([]() {
     Serial.println("Accessing captive portal");
-    webServer.send(200, "text/html", responseHTML);
+    webServer.send(200, "text/html", captivePortalHTML);
   });
   webServer.begin();
 }
