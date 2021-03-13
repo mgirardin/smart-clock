@@ -3,6 +3,7 @@
 #include <ESP8266WebServer.h>
 
 String wakeUpTime;
+String currentTime;
 
 /* Debug Config */
 const static int debugPortBaud = 115200;
@@ -27,30 +28,42 @@ const static String captivePortalHTML = ""
                       "<p></p>"
                       "<form action='/wake_up_time' method='post'>"
                       "<label for='time'>Horário:</label><br>"
-                      "<input type='time' id='time' name='time'>"
+                      "<input type='time' id='wakeUpTime' name='wakeUpTime'>"
+                      "<input type='hidden' id='currentTime' name='currentTime'>"
                       "<input type='submit'>"
-                      "</form>";
+                      "</form>"
+                      "<script type='text/javascript'>"
+                      "var d = new Date();"
+                      "var hours = d.getHours();"
+                      "if (hours < 10) {"
+                      "hours = '0' + hours;"
+                      "}"
+                      "var mins = d.getMinutes();"
+                      "if (mins < 10) {"
+                      "mins = '0' + mins;"
+                      "}"
+                      "var seconds = d.getSeconds();"
+                      "if (seconds < 10) {"
+                      "seconds = '0' + seconds;"
+                      "}"
+                      "document.getElementById('currentTime').value = hours + ':' + mins + ':' + seconds;"
+                      "</script>";
 /* HTML Pages */
 
 /* HTTP Request Handlers */
 void handle_wake_up_time() {
-  Serial.println("Posting wake up time");
-  Serial.print("Number of args: ");
-  Serial.println(webServer.args());
-  if(webServer.args() >= 1){
-    Serial.print("Setting wake up time to arg: ");
-    Serial.println(webServer.arg(0));
-    wakeUpTime = webServer.arg(0);
-  } else {
-    Serial.println("Not changing wake up time because request didnt have any argument");
-  }
+  Serial.println("[POST] /wake_up_time");
   
-  if(webServer.hasHeader("Date")){
-    Serial.print("Date header: ");
-    Serial.println(webServer.header("Date"));
+  if(webServer.hasArg("wakeUpTime")){
+      Serial.print("Updating wake up time: ");
+      wakeUpTime = webServer.arg("wakeUpTime");
+      Serial.println(wakeUpTime);
   }
-  Serial.print("Updated wake up time: ");
-  Serial.println(wakeUpTime);
+  if(webServer.hasArg("currentTime")){
+      Serial.print("Updating current time: ");
+      currentTime = webServer.arg("currentTime");
+      Serial.println(currentTime);
+  }
   webServer.send(200, "text/html", "ok");
 }
 
@@ -86,5 +99,8 @@ void loop()
   dnsServer.processNextRequest();
   webServer.handleClient();
   Serial.printf("Stations connected = %d\n", WiFi.softAPgetStationNum());
+  // if(shouldBeep()) {
+  //   Beep();
+  // }
   delay(3000);
 }
