@@ -1,27 +1,24 @@
 //Accelerometer Module for Smart Alarm Clock
 #include <Wire.h>         // biblioteca de comunicação I2C
  
-/*
- * Definições de alguns endereços mais comuns do MPU6050
- * os registros podem ser facilmente encontrados no mapa de registros do MPU6050
- */
-const int MPU_ADDR =      0x68; // definição do endereço do sensor MPU6050 (0x68)
-const int WHO_AM_I =      0x75; // registro de identificação do dispositivo
-const int PWR_MGMT_1 =    0x6B; // registro de configuração do gerenciamento de energia
-const int GYRO_CONFIG =   0x1B; // registro de configuração do giroscópio
-const int ACCEL_CONFIG =  0x1C; // registro de configuração do acelerômetro
-const int ACCEL_XOUT =    0x3B; // registro de leitura do eixo X do acelerômetro
+// Map some registers for MPU6050
+const int MPU_ADDR =      0x68; // define sensor adress MPU6050 (0x68)
+const int WHO_AM_I =      0x75; // device identification
+const int PWR_MGMT_1 =    0x6B; // energy configuration
+const int GYRO_CONFIG =   0x1B; // gyro configuration
+const int ACCEL_CONFIG =  0x1C; // accelerometer configuration
+const int ACCEL_XOUT =    0x3B; // X axis of accelerometer
  
-const int sda_pin = D5; // definição do pino I2C SDA
-const int scl_pin = D6; // definição do pino I2C SCL
+const int sda_pin = D5; // I2C SDA pin
+const int scl_pin = D6; // I2C SCL pin
  
 bool led_state = false;
  
-// variáveis para armazenar os dados "crus" do acelerômetro
+// Variables to store raw data
 int16_t AcX, AcY, AcZ, Tmp, GyX, GyY, GyZ; 
  
 /*
- * função que configura a I2C com os pinos desejados 
+ * Configure I2C binding to the pins
  * sda_pin -> D5
  * scl_pin -> D6
  */
@@ -31,32 +28,32 @@ void initI2C()
 }
  
 /*
- * função que escreve um dado valor em um dado registro
+ * Func to write value to MPU register
  */
-void writeRegMPU(int reg, int val)      //aceita um registro e um valor como parâmetro
+void writeRegMPU(int reg, int val)
 {
-  Wire.beginTransmission(MPU_ADDR);     // inicia comunicação com endereço do MPU6050
-  Wire.write(reg);                      // envia o registro com o qual se deseja trabalhar
-  Wire.write(val);                      // escreve o valor no registro
-  Wire.endTransmission(true);           // termina a transmissão
+  Wire.beginTransmission(MPU_ADDR);     // Start communication with MPU6050
+  Wire.write(reg);                      // send register to work with
+  Wire.write(val);                      // write value to register
+  Wire.endTransmission(true);           // ends transmition
 }
  
 /*
- * função que lê de um dado registro
+ * Func to read data from register
  */
-uint8_t readRegMPU(uint8_t reg)        // aceita um registro como parâmetro
+uint8_t readRegMPU(uint8_t reg)     
 {
   uint8_t data;
-  Wire.beginTransmission(MPU_ADDR);     // inicia comunicação com endereço do MPU6050
-  Wire.write(reg);                      // envia o registro com o qual se deseja trabalhar
-  Wire.endTransmission(false);          // termina transmissão mas continua com I2C aberto (envia STOP e START)
-  Wire.requestFrom(MPU_ADDR, 1);        // configura para receber 1 byte do registro escolhido acima
-  data = Wire.read();                   // lê o byte e guarda em 'data'
-  return data;                          //retorna 'data'
+  Wire.beginTransmission(MPU_ADDR);     
+  Wire.write(reg);                      
+  Wire.endTransmission(false);          
+  Wire.requestFrom(MPU_ADDR, 1);        
+  data = Wire.read();                   
+  return data;                          
 }
  
 /*
- * função que procura pelo sensor no endereço 0x68
+ * Function to find sensor at 0x68
  */
 void findMPU(int mpu_addr)
 {
@@ -65,17 +62,17 @@ void findMPU(int mpu_addr)
  
   if(data == 0)
   {
-    Serial.print("Dispositivo encontrado no endereço: 0x");
+    Serial.print("Device found at: 0x");
     Serial.println(MPU_ADDR, HEX);
   }
   else
   {
-    Serial.println("Dispositivo não encontrado!");
+    Serial.println("ERROR: Device not found!");
   }
 }
  
 /*
- * função que verifica se o sensor responde e se está ativo
+ * Check if sensor is active and responding
  */
 void checkMPU(int mpu_addr)
 {
@@ -85,18 +82,18 @@ void checkMPU(int mpu_addr)
    
   if(data == 104) 
   {
-    Serial.println("MPU6050 Dispositivo respondeu OK! (104)");
+    Serial.println("MPU6050 device returns OK! (104)");
  
     data = readRegMPU(PWR_MGMT_1); // Register 107 – Power Management 1-0x6B
  
-    if(data == 64) Serial.println("MPU6050 em modo SLEEP! (64)");
-    else Serial.println("MPU6050 em modo ACTIVE!"); 
+    if(data == 64) Serial.println("MPU6050 in SLEEP mode! (64)");
+    else Serial.println("MPU6050 in ACTIVE mode!"); 
   }
-  else Serial.println("Verifique dispositivo - MPU6050 NÃO disponível!");
+  else Serial.println("MPU6050 not available!");
 }
  
 /*
- * função de inicialização do sensor
+ * Start MPU sensor
  */
 void initMPU()
 {
@@ -106,16 +103,16 @@ void initMPU()
 }
  
 /* 
- *  função para configurar o sleep bit  
+ *  Configure sleep bit 
  */
 void setSleepOff()
 {
-  writeRegMPU(PWR_MGMT_1, 0); // escreve 0 no registro de gerenciamento de energia(0x68), colocando o sensor em o modo ACTIVE
+  writeRegMPU(PWR_MGMT_1, 0); // writes 0 to energy management registry (0x68), settin sensor to ACTIVE mode
 }
  
-/* função para configurar as escalas do giroscópio
-   registro da escala do giroscópio: 0x1B[4:3]
-   0 é 250°/s
+/* Set gyro scales
+   scale register: 0x1B[4:3]
+   0 == 250°/s
  
     FS_SEL  Full Scale Range
       0        ± 250 °/s      0b00000000
@@ -128,9 +125,9 @@ void setGyroScale()
   writeRegMPU(GYRO_CONFIG, 0);
 }
  
-/* função para configurar as escalas do acelerômetro
-   registro da escala do acelerômetro: 0x1C[4:3]
-   0 é 250°/s
+/* Set accelerometer scale
+   Acc scale register: 0x1C[4:3]
+   0 == 2g
  
     AFS_SEL   Full Scale Range
       0           ± 2g            0b00000000
@@ -143,8 +140,8 @@ void setAccelScale()
   writeRegMPU(ACCEL_CONFIG, 0);
 }
  
-/* função que lê os dados 'crus'(raw data) do sensor
-   são 14 bytes no total sendo eles 2 bytes para cada eixo e 2 bytes para temperatura:
+/* Reads sensors raw data
+   14 bytes, 2 bytes for each axis and 2 bytes for temperature:
  
   0x3B 59 ACCEL_XOUT[15:8]
   0x3C 60 ACCEL_XOUT[7:0]
@@ -166,10 +163,10 @@ void setAccelScale()
 */
 void readRawMPU()
 {  
-  Wire.beginTransmission(MPU_ADDR);       // inicia comunicação com endereço do MPU6050
-  Wire.write(ACCEL_XOUT);                 // envia o registro com o qual se deseja trabalhar, começando com registro 0x3B (ACCEL_XOUT_H)
-  Wire.endTransmission(false);            // termina transmissão mas continua com I2C aberto (envia STOP e START)
-  Wire.requestFrom(MPU_ADDR, 14, true);    // configura para receber 14 bytes começando do registro escolhido acima (0x3B)
+  Wire.beginTransmission(MPU_ADDR);       
+  Wire.write(ACCEL_XOUT);                 
+  Wire.endTransmission(false);            
+  Wire.requestFrom(MPU_ADDR, 14, true);   
  
   AcX = Wire.read() << 8 | Wire.read();
   AcY = Wire.read() << 8 | Wire.read();
@@ -190,7 +187,7 @@ void readRawMPU()
   Serial.print(" | GyZ = "); Serial.println(GyZ/131.0);
  
   led_state = !led_state;
-  digitalWrite(LED_BUILTIN, led_state);         // pisca LED do NodeMCU a cada leitura do sensor
+  digitalWrite(LED_BUILTIN, led_state);        
   delay(50);                                        
 }
  
@@ -198,15 +195,15 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
  
-  Serial.println("Iniciando configuração do MPU6050");
+  Serial.println("Starting MPU6050 configuration");
   initI2C();
   initMPU();
   checkMPU(MPU_ADDR);
 
-  Serial.println("Configuração finalizada, iniciando loop");  
+  Serial.println("End of configuration, beggin");  
 }
  
 void loop() {
-  readRawMPU();    // lê os dados do sensor
+  readRawMPU();   
   delay(100);  
 }
