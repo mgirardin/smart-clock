@@ -1,5 +1,6 @@
 //Accelerometer Module for Smart Alarm Clock
 #include <Wire.h>         // biblioteca de comunicação I2C
+
  
 // Map some registers for MPU6050
 const int MPU_ADDR =      0x68; // define sensor adress MPU6050 (0x68)
@@ -15,8 +16,12 @@ const int scl_pin = D6; // I2C SCL pin
 bool led_state = false;
  
 // Variables to store raw data
-int16_t AcX, AcY, AcZ, Tmp, GyX, GyY, GyZ; 
- 
+int AcX, AcY, AcZ, Tmp, GyX, GyY, GyZ; 
+float mid = 0;
+int count = 0;
+int last[30];  
+int sum = 0;
+int walk = 0;
 /*
  * Configure I2C binding to the pins
  * sda_pin -> D5
@@ -171,39 +176,72 @@ void readRawMPU()
   AcX = Wire.read() << 8 | Wire.read();
   AcY = Wire.read() << 8 | Wire.read();
   AcZ = Wire.read() << 8 | Wire.read();
+
+  int AcXMod = (AcX > 0) ? AcX : -AcX;
+  int AcYMod = (AcY > 0) ? AcY : -AcY;
+  int AcZMod = (AcZ > 0) ? AcZ : -AcZ;
+  
+  int Sum = AcXMod + AcYMod + AcZMod;
+
+  if(count < 30 ){
+    last[count] = Sum;
+    sum += Sum;
+    count++;
+    mid = sum/count;
+  } else {
+    sum  = sum + Sum - last[0];
+    for(int i=0; i<29; i++){
+      last[i] = last[i+1];
+    }
+    last[29] = Sum;
+    mid = sum/30;
+    int cur = ((Sum - mid) > 0) ? 1 : -1;
+    if(cur == 1 && walk == -1 ||
+       cur == -1 && walk == 1) {
+      Serial.print("PASSO");    
+    }
+    walk = cur;
+  }
+
+//  Serial.print("AcXMod: ");
+//  Serial.print(AcXMod);
+//  Serial.print(" . AcYMod: ");
+//  Serial.print(AcYMod);
+//  Serial.print(" . AcZMod: ");
+//  Serial.print(AcZMod);
+//  Serial.print("\n");
+//  Serial.print(mid);
+//  Serial.print("\n");
+//  Serial.print("\n");
+  //Tmp = Wire.read() << 8 | Wire.read();
  
-  Tmp = Wire.read() << 8 | Wire.read();
+  //GyX = Wire.read() << 8 | Wire.read();
+  //GyY = Wire.read() << 8 | Wire.read();
+  //GyZ = Wire.read() << 8 | Wire.read(); 
  
-  GyX = Wire.read() << 8 | Wire.read();
-  GyY = Wire.read() << 8 | Wire.read();
-  GyZ = Wire.read() << 8 | Wire.read(); 
- 
-  Serial.print("AcX = "); Serial.print(AcX/16384.0);
-  Serial.print(" | AcY = "); Serial.print(AcY/16384.0);
-  Serial.print(" | AcZ = "); Serial.print(AcZ/16384.0);
-  Serial.print(" | Tmp = "); Serial.print(Tmp/340.00+36.53);
-  Serial.print(" | GyX = "); Serial.print(GyX/131.0);
-  Serial.print(" | GyY = "); Serial.print(GyY/131.0);
-  Serial.print(" | GyZ = "); Serial.println(GyZ/131.0);
+  //Serial.print("AcX = "); Serial.print(AcX/16384.0);
+  //Serial.print(" | AcY = "); Serial.print(AcY/16384.0);
+  //Serial.print(" | AcZ = "); Serial.print(AcZ/16384.0);
+  //Serial.print(" | Tmp = "); Serial.print(Tmp/340.00+36.53);
+  //Serial.print(" | GyX = "); Serial.print(GyX/131.0);
+  //Serial.print(" | GyY = "); Serial.print(GyY/131.0);
+  //Serial.print(" | GyZ = "); Serial.println(GyZ/131.0);
  
   led_state = !led_state;
   digitalWrite(LED_BUILTIN, led_state);        
   delay(50);                                        
 }
  
-void setup() {
+void setupMpu9060() 
+{
   pinMode(LED_BUILTIN, OUTPUT);
-  Serial.begin(115200);
- 
   Serial.println("Starting MPU6050 configuration");
   initI2C();
   initMPU();
   checkMPU(MPU_ADDR);
-
-  Serial.println("End of configuration, beggin");  
+  Serial.println("End of MPU6050 configuration, beggin");  
 }
- 
-void loop() {
+// 
+void loopMpu9060() {
   readRawMPU();   
-  delay(100);  
 }
