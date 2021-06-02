@@ -3,7 +3,7 @@
 
  
 // Map some registers for MPU6050
-const int MPU_ADDR =      0x68; // define sensor adress MPU6050 (0x68)
+const int MPU_ADDR =      0x69; // define sensor adress MPU6050 (0x68)
 const int WHO_AM_I =      0x75; // device identification
 const int PWR_MGMT_1 =    0x6B; // energy configuration
 const int GYRO_CONFIG =   0x1B; // gyro configuration
