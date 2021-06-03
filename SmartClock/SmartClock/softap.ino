@@ -72,6 +72,9 @@ void setupSoftAP()
   Serial.println();
 
   Serial.println("Setting soft-AP ... ");
+  WiFi.disconnect(true);
+  WiFi.mode(WIFI_AP);
+  WiFi.setOutputPower(20.5);
   WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
   boolean softApGenerationResult = WiFi.softAP(softApSsid, softApPassword);
   if(softApGenerationResult) Serial.println("Soft-AP ready");
@@ -91,7 +94,7 @@ void loopSoftAP()
 {
   dnsServer.processNextRequest();
   webServer.handleClient();
-  Serial.printf("Stations connected = %d\n", WiFi.softAPgetStationNum());
+//  Serial.printf("Stations connected = %d\n", WiFi.softAPgetStationNum());
 }
 
 boolean wakeUpTimeIsSetted(){

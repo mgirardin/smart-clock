@@ -31,21 +31,28 @@ boolean alarmIsRunning;
 
 void loopRtc()
 {
-      now = rtc.now();
+    now = rtc.now();
     if(String(now.day()) != prevDay) {
       prevDay = now.day();
       alarmRunned = false;
       alarmIsRunning = false;
+      Serial.println("DIA = HOJE");
     }
     if(alarmRunned == true){
+      Serial.println("Alarme tá rodando");
       return;
     }
     if((atLeastTwoDigits(String(now.hour())) + ":" + atLeastTwoDigits(String(now.minute()))) > getWakeUpTime()) {
       if(getWakeUpTime() == "") {
+      Serial.println("Wake up time vazio");
         return;
       }
+      Serial.println("RODANO");
       alarmRunned = true;
       alarmIsRunning = true;
+    } else {
+      Serial.println(atLeastTwoDigits(String(now.hour())) + ":" + atLeastTwoDigits(String(now.minute())));
+      Serial.println(getWakeUpTime());
     }
 }
 

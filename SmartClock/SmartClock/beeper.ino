@@ -41,5 +41,5 @@ void smartBeep() {
     }
     j++;
     if(j == length) j = 0;
-    Serial.println(j);
+//    Serial.println(j);
 }
