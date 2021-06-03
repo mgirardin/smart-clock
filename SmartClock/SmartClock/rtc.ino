@@ -21,21 +21,34 @@ void setupRtc()
   }
 }
 
+//String createDateTimeString(DateTime now){
+//  return now.year() + '-' + now.month() + '-' + now.day +  " " + now.hour + ":" + now.minute() + ":" + now.second();
+//}
+
+String prevDay;
+boolean alarmRunned;
+boolean alarmIsRunning;
+
 void loopRtc()
 {
-  DateTime now = rtc.now();
+      now = rtc.now();
+    if(String(now.day()) != prevDay) {
+      prevDay = now.day();
+      alarmRunned = false;
+      alarmIsRunning = false;
+    }
+    if(alarmRunned == true){
+      return;
+    }
+    if((atLeastTwoDigits(String(now.hour())) + ":" + atLeastTwoDigits(String(now.minute()))) > getWakeUpTime()) {
+      if(getWakeUpTime() == "") {
+        return;
+      }
+      alarmRunned = true;
+      alarmIsRunning = true;
+    }
+}
 
-    Serial.print(now.year(), DEC);
-    Serial.print('/');
-    Serial.print(now.month(), DEC);
-    Serial.print('/');
-    Serial.print(now.day(), DEC);
-    Serial.print(now.hour(), DEC);
-    Serial.print(':');
-    Serial.print(now.minute(), DEC);
-    Serial.print(':');
-    Serial.print(now.second(), DEC);
-    Serial.println("\n");
-  // write time & date data to the RTC chip
-  readRawMPU();     
+boolean alarmActivated(){
+  return alarmIsRunning;
 }

@@ -3,11 +3,7 @@
 #include <ESP8266WebServer.h>
 
 String wakeUpTime;
-String currentTime;
-
-/* Debug Config */
-const static int debugPortBaud = 115200;
-/* Debug Config */
+bool wakeUpTimeSetted;
 
 /* Server Config Variables */
 const static byte DNS_PORT = 53;
@@ -57,13 +53,11 @@ void handle_wake_up_time() {
   if(webServer.hasArg("wakeUpTime")){
       Serial.print("Updating wake up time: ");
       wakeUpTime = webServer.arg("wakeUpTime");
+      wakeUpTimeSetted = true;
       Serial.println(wakeUpTime);
   }
-  if(webServer.hasArg("currentTime")){
-      Serial.print("Updating current time: ");
-      currentTime = webServer.arg("currentTime");
-      Serial.println(currentTime);
-  }
+
+  Serial.println("\n");
   webServer.send(200, "text/html", "ok");
 }
 
@@ -75,7 +69,6 @@ void handle_not_found() {
 
 void setupSoftAP()
 {
- Serial.begin(debugPortBaud);
   Serial.println();
 
   Serial.println("Setting soft-AP ... ");
@@ -99,4 +92,12 @@ void loopSoftAP()
   dnsServer.processNextRequest();
   webServer.handleClient();
   Serial.printf("Stations connected = %d\n", WiFi.softAPgetStationNum());
+}
+
+boolean wakeUpTimeIsSetted(){
+  return wakeUpTimeSetted;
+}
+
+String getWakeUpTime() {
+  return wakeUpTime;
 }

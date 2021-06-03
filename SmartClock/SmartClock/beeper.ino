@@ -30,22 +30,10 @@ void setupBeeper() {
   pinMode(speakerPin, OUTPUT);
 }
 
-void beep() {
-  for (int i = 0; i < length; i++) {
-    if (notes[i] == ' ') {
-      delay(beats[i] * tempo); // rest
-    } else {
-      playNote(notes[i], beats[i] * tempo);
-    }
-
-    // pause between notes
-    delay(tempo / 2);
-  }
-}
-
 int j = 0;
 
 void smartBeep() {
+    delay(150);
     if (notes[j] == ' ') {
       delay(beats[j] * tempo); // rest
     } else {

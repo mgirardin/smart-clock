@@ -166,6 +166,8 @@ void setAccelScale()
   0x48 72 GYRO_ZOUT[7:0]
     
 */
+
+boolean walking;
 void readRawMPU()
 {  
   Wire.beginTransmission(MPU_ADDR);       
@@ -198,7 +200,9 @@ void readRawMPU()
     int cur = ((Sum - mid) > 0) ? 1 : -1;
     if(cur == 1 && walk == -1 ||
        cur == -1 && walk == 1) {
-      Serial.print("PASSO");    
+      walking = true;
+    } else {
+      walking = false;
     }
     walk = cur;
   }
@@ -244,4 +248,8 @@ void setupMpu9060()
 // 
 void loopMpu9060() {
   readRawMPU();   
+}
+
+boolean isWalking(){ 
+  return walking;
 }

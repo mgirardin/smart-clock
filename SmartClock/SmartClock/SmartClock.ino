@@ -12,7 +12,8 @@ void loop()
 {
   loopRtc();
   loopMpu9060();
-  loopSoftAP();
-  smartBeep();
-  delay(150); 
+  if(alarmActivated() && !isWalking()){
+    smartBeep();
+  } 
+  if(!wakeUpTimeIsSetted()) loopSoftAP();
 }
