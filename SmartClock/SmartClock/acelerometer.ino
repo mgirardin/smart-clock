@@ -10,8 +10,8 @@ const int GYRO_CONFIG =   0x1B; // gyro configuration
 const int ACCEL_CONFIG =  0x1C; // accelerometer configuration
 const int ACCEL_XOUT =    0x3B; // X axis of accelerometer
  
-const int sda_pin = D5; // I2C SDA pin
-const int scl_pin = D6; // I2C SCL pin
+const int sda_pin = D2; // I2C SDA pin
+const int scl_pin = D1; // I2C SCL pin
  
 bool led_state = false;
  

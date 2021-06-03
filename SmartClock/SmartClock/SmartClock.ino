@@ -1,14 +1,18 @@
 void setup()
 {
-  Serial.println("Starting...");
   Serial.begin(115200);
+  Serial.println("Starting...");
   setupRtc();
   setupMpu9060();
+  setupBeeper();
+  setupSoftAP();
 }
 
 void loop()
 {
   loopRtc();
   loopMpu9060();
-  delay(100); 
+  loopSoftAP();
+  smartBeep();
+  delay(150); 
 }

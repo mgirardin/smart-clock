@@ -42,3 +42,16 @@ void beep() {
     delay(tempo / 2);
   }
 }
+
+int j = 0;
+
+void smartBeep() {
+    if (notes[j] == ' ') {
+      delay(beats[j] * tempo); // rest
+    } else {
+      playNote(notes[j], beats[j] * tempo);
+    }
+    j++;
+    if(j == length) j = 0;
+    Serial.println(j);
+}
