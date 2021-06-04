@@ -62,12 +62,12 @@ void findMPU(int mpu_addr)
 
   if (data == 0)
   {
-    Serial.print("Device found at: 0x");
-    Serial.println(MPU_ADDR, HEX);
+//    Serial.print("Device found at: 0x");
+//    Serial.println(MPU_ADDR, HEX);
   }
   else
   {
-    Serial.println("ERROR: Device not found!");
+//    Serial.println("ERROR: Device not found!");
   }
 }
 
@@ -82,18 +82,19 @@ void checkMPU(int mpu_addr)
 
   if (data == 104)
   {
-    Serial.println("MPU6050 device returns OK! (104)");
+//    Serial.println("MPU6050 device returns OK! (104)");
 
     data = readRegMPU(PWR_MGMT_1); // Register 107 – Power Management 1-0x6B
 
-    if (data == 64)
-      Serial.println("MPU6050 in SLEEP mode! (64)");
-    else
-      Serial.println("MPU6050 in ACTIVE mode!");
+//    if (data == 64)
+//      Serial.println("MPU6050 in SLEEP mode! (64)");
+//    else
+//      Serial.println("MPU6050 in ACTIVE mode!");
   }
-  else
-    Serial.println("MPU6050 not available!");
+//  else
+//    Serial.println("MPU6050 not available!");
 }
+
 
 /*
  * Start MPU sensor
@@ -245,11 +246,11 @@ void readRawMPU()
 void setupMpu9060()
 {
   pinMode(LED_BUILTIN, OUTPUT);
-  Serial.println("Starting MPU6050 configuration");
+//  Serial.println("Starting MPU6050 configuration");
   initI2C();
   initMPU();
   checkMPU(MPU_ADDR);
-  Serial.println("End of MPU6050 configuration, beggin");
+//  Serial.println("End of MPU6050 configuration, beggin");
 }
 //
 void loopMpu9060()

@@ -39,10 +39,10 @@ void loopRtc()
       Serial.println("DIA = HOJE");
     }
     if(alarmRunned == true){
-      Serial.println("Alarme tá rodando");
+      Serial.println("Alarme já foi ativo");
       return;
     }
-    if((atLeastTwoDigits(String(now.hour())) + ":" + atLeastTwoDigits(String(now.minute()))) > getWakeUpTime()) {
+    if((atLeastTwoDigits(String(now.hour())) + ":" + atLeastTwoDigits(String(now.minute()))) >= getWakeUpTime()) {
       if(getWakeUpTime() == "") {
       Serial.println("Wake up time vazio");
         return;
@@ -58,4 +58,8 @@ void loopRtc()
 
 boolean alarmActivated(){
   return alarmIsRunning;
+}
+
+void turnOffAlarm(){
+  alarmIsRunning = false;
 }

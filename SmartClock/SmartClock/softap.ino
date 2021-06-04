@@ -23,7 +23,7 @@ const static String captivePortalHTML = ""
                       "<p></p>"
                       "<p></p>"
                       "<form action='/wake_up_time' method='post'>"
-                      "<label for='time'>Horário:</label><br>"
+                      "<label for='time'>Horario:</label><br>"
                       "<input type='time' id='wakeUpTime' name='wakeUpTime'>"
                       "<input type='hidden' id='currentTime' name='currentTime'>"
                       "<input type='submit'>"
@@ -103,4 +103,8 @@ boolean wakeUpTimeIsSetted(){
 
 String getWakeUpTime() {
   return wakeUpTime;
+}
+
+void turnOffSoftAP() {
+  webServer.stop();
 }
